@@ -30,6 +30,15 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         this.roomList = roomList;
         this.listener = listener;
     }
+    
+    public RoomAdapter(android.content.Context context, List<Room> roomList) {
+        this.roomList = roomList;
+        this.listener = null;
+    }
+    
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView name, price, status;
