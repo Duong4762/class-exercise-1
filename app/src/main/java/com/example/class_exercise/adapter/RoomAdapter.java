@@ -30,15 +30,6 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         this.roomList = roomList;
         this.listener = listener;
     }
-    
-    public RoomAdapter(android.content.Context context, List<Room> roomList) {
-        this.roomList = roomList;
-        this.listener = null;
-    }
-    
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView name, price, status;
@@ -67,13 +58,18 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         Room room = roomList.get(position);
 
         holder.name.setText(room.getRoomName());
-        holder.price.setText("Price: " + room.getPrice());
-        holder.status.setText("Status: " + room.getStatus());
+        
+        String priceFormatted = String.format("%,.0f VNĐ/tháng", room.getPrice());
+        holder.price.setText("Giá: " + priceFormatted);
+        
+        holder.status.setText(room.getStatus());
 
-        if ("Trống".equalsIgnoreCase(room.getStatus()) || "Available".equalsIgnoreCase(room.getStatus())) {
-            holder.status.setTextColor(Color.GREEN);
+        if ("Còn trống".equalsIgnoreCase(room.getStatus()) || "Available".equalsIgnoreCase(room.getStatus())) {
+            holder.status.setBackgroundColor(Color.parseColor("#4CAF50"));
+            holder.status.setTextColor(Color.WHITE);
         } else {
-            holder.status.setTextColor(Color.RED);
+            holder.status.setBackgroundColor(Color.parseColor("#F44336"));
+            holder.status.setTextColor(Color.WHITE);
         }
 
         holder.itemView.setOnClickListener(v -> {

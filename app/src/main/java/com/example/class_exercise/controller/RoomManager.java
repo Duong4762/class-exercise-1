@@ -34,4 +34,13 @@ public class RoomManager {
         }
         return null;
     }
+    
+    public static Room getRoomById(String roomId) {
+        for (Room room : roomList) {
+            if (room.getRoomId().equals(roomId)) {
+                return room;
+            }
+        }
+        return null;
+    }
 }
