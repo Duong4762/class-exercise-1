@@ -14,43 +14,36 @@ import com.example.class_exercise.R;
 import com.example.class_exercise.model.Room;
 
 import java.util.List;
+import java.util.Locale;
 
 public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
 
     private List<Room> roomList;
-    private OnItemClickListener listener;
+    private OnRoomClickListener listener;
 
-    public interface OnItemClickListener {
-        void onItemClick(int position);
-        void onEditClick(int position);
-        void onDeleteClick(int position);
+    // Interface để xử lý sự kiện click
+    public interface OnRoomClickListener {
+        void onItemClick(Room room, int position);
+        void onEditClick(Room room, int position);
+        void onDeleteClick(Room room, int position);
     }
 
-    public RoomAdapter(List<Room> roomList, OnItemClickListener listener) {
+    public RoomAdapter(List<Room> roomList, OnRoomClickListener listener) {
         this.roomList = roomList;
         this.listener = listener;
     }
-    
-    public RoomAdapter(android.content.Context context, List<Room> roomList) {
-        this.roomList = roomList;
-        this.listener = null;
-    }
-    
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
-    }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView name, price, status;
-        Button delete, edit;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView txtRoomName, txtPrice, txtStatus;
+        Button btnEdit, btnDelete;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            name = itemView.findViewById(R.id.txtRoomName);
-            price = itemView.findViewById(R.id.txtPrice);
-            status = itemView.findViewById(R.id.txtStatus);
-            edit = itemView.findViewById(R.id.btnEdit);
-            delete = itemView.findViewById(R.id.btnDelete);
+            txtRoomName = itemView.findViewById(R.id.txtRoomName);
+            txtPrice = itemView.findViewById(R.id.txtPrice);
+            txtStatus = itemView.findViewById(R.id.txtStatus);
+            btnEdit = itemView.findViewById(R.id.btnEdit);
+            btnDelete = itemView.findViewById(R.id.btnDelete);
         }
     }
 
@@ -66,31 +59,51 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Room room = roomList.get(position);
 
-        holder.name.setText(room.getRoomName());
-        holder.price.setText("Price: " + room.getPrice());
-        holder.status.setText("Status: " + room.getStatus());
+        // Đổ dữ liệu vào view
+        holder.txtRoomName.setText(room.getRoomName());
+        holder.txtPrice.setText("Giá: " + String.format(Locale.getDefault(), "%,.0f", room.getPrice()) + " VND");
+        holder.txtStatus.setText("Trạng thái: " + room.getStatus());
 
+        // Hiển thị màu sắc theo trạng thái
         if ("Trống".equalsIgnoreCase(room.getStatus()) || "Available".equalsIgnoreCase(room.getStatus())) {
-            holder.status.setTextColor(Color.GREEN);
+            holder.txtStatus.setTextColor(Color.GREEN);
         } else {
-            holder.status.setTextColor(Color.RED);
+            holder.txtStatus.setTextColor(Color.RED);
         }
 
+        // Xử lý sự kiện click item sử dụng getAdapterPosition() để đảm bảo chính xác
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) listener.onItemClick(position);
+            int currentPos = holder.getAdapterPosition();
+            if (listener != null && currentPos != RecyclerView.NO_POSITION) {
+                listener.onItemClick(roomList.get(currentPos), currentPos);
+            }
         });
 
-        holder.edit.setOnClickListener(v -> {
-            if (listener != null) listener.onEditClick(position);
+        // Xử lý nút Edit
+        holder.btnEdit.setOnClickListener(v -> {
+            int currentPos = holder.getAdapterPosition();
+            if (listener != null && currentPos != RecyclerView.NO_POSITION) {
+                listener.onEditClick(roomList.get(currentPos), currentPos);
+            }
         });
 
-        holder.delete.setOnClickListener(v -> {
-            if (listener != null) listener.onDeleteClick(position);
+        // Xử lý nút Delete
+        holder.btnDelete.setOnClickListener(v -> {
+            int currentPos = holder.getAdapterPosition();
+            if (listener != null && currentPos != RecyclerView.NO_POSITION) {
+                listener.onDeleteClick(roomList.get(currentPos), currentPos);
+            }
         });
     }
 
     @Override
     public int getItemCount() {
-        return roomList.size();
+        return roomList != null ? roomList.size() : 0;
+    }
+
+    // Phương thức để cập nhật lại danh sách dữ liệu
+    public void updateData(List<Room> newList) {
+        this.roomList = newList;
+        notifyDataSetChanged();
     }
 }
